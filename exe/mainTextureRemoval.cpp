@@ -10,9 +10,9 @@
 * form. A license must be obtained from the author of the code for any other use.
 *
 */
-#include "CradleFunctions.h"
-#include "TextureRemoval.h"
-#include "FFST.h"
+#include <platypus/CradleFunctions.h>
+#include <platypus/TextureRemoval.h>
+#include <platypus/FFST.h>
 #include <opencv2/flann.hpp>
 
 /**

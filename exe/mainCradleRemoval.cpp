@@ -10,7 +10,7 @@
 * form. A license must be obtained from the author of the code for any other use.
 *
 */
-#include "CradleFunctions.h"
+#include <platypus/CradleFunctions.h>
 
 /**
 * This piece of demo code demonstrates cradle removal for an image specified by the user.

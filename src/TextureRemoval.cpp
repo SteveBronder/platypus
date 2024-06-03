@@ -11,11 +11,11 @@
 *
 */
 
-#include "TextureRemoval.h"
-#include "CradleFunctions.h"
+#include <platypus/TextureRemoval.h>
+#include <platypus/CradleFunctions.h>
+#include <platypus/MCA.h>
+#include <platypus/FFST.h>
 #include <opencv2/flann.hpp>
-#include "MCA.h"
-#include "FFST.h"
 #include <random>
 
 #define PI 3.1415927

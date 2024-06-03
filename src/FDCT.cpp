@@ -10,7 +10,7 @@
 * form. A license must be obtained from the author of the code for any other use.
 *
 */
-#include "FDCT.h"
+#include <platypus/FDCT.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 

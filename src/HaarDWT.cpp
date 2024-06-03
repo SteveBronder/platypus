@@ -10,10 +10,10 @@
 * form. A license must be obtained from the author of the code for any other use.
 *
 */
+#include <platypus/HaarDWT.h>
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <stdio.h>
-#include "HaarDWT.h"
 
 //Code provided by Andrey Smorodov
 //See: http://stackoverflow.com/questions/20071854/wavelet-transform-in-opencv

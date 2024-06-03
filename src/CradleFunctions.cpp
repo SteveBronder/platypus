@@ -11,8 +11,8 @@
 *
 */
 
-#include "CradleFunctions.h"
-#include "TextureRemoval.h"
+#include <platypus/CradleFunctions.h>
+#include <platypus/TextureRemoval.h>
 #include <fstream>
 
 /**

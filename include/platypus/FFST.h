@@ -10,8 +10,8 @@
 * form. A license must be obtained from the author of the code for any other use.
 *
 */
-#include <vector>
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 /**
 * Fast finite shearlet tranform implementation following the Matlab implementation

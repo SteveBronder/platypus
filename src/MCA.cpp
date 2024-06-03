@@ -11,11 +11,11 @@
 *
 */
 
-#include "Shearlet.h"
-#include "HaarDWT.h"
-#include "MCA.h"
-#include "DWT.h"
-#include "FDCT.h"
+#include <platypus/Shearlet.h>
+#include <platypus/HaarDWT.h>
+#include <platypus/MCA.h>
+#include <platypus/DWT.h>
+#include <platypus/FDCT.h>
 
 /**
 * Morphological Component Analysis (MCA) implementation based on the MCALab Matlab

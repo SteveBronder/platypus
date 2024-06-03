@@ -24,7 +24,7 @@ license.txt    license file (GPL v3+)
 
 == Requirements ==
 
-This code needs OpenCV 2.4.8+ or 3.1+ in order to compile.
+This code needs OpenCV 4+ in order to compile.
 Additionally, compiling is recommended with gcc 4.7.2+, older compiler versions 
 were not tested.
 
@@ -34,10 +34,16 @@ commercial use.
 
 == Compilation ==
 
-Simply use the provided Makefile in the src directory, with the command `make`.
-Make sure to edit the makefile to point to the correct path of your OpenCV installation.
-The Makefile provided is configured for OpenCV 3.1, but the code was tested to also 
-compile with OpenCV 2.4.9.
+Make the executables with the following
+
+```bash
+cmake -S . -B "build" -DCMAKE_BUILD_TYPE=RELEASE
+cd build
+make -j2 all
+```
+
+The executables `Demo`, `CradleRemove`, and `TextureRemoval` will be available in the `build/bin` directory.
+
 
 == Usage ==
 
