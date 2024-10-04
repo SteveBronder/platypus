@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright (c) 2016, Gabor Adam Fodor <fogggab@yahoo.com>
 * All rights reserved.
@@ -29,7 +30,7 @@ namespace MCA{
 
 	//Separate image 'in' into a texture and cartoon part using the dictionaries specified in dict
 	void MCA_Bcr(cv::Mat &in, std::vector<int> &dict, cv::Mat &texture, cv::Mat &cartoon);
-	
+
 	//Auxiliary functions for the MCA decomposition
 	//More details are given in the Matlab code from which these functions were translated
 	cv::Mat TVCorrection(cv::Mat &x, float gamma);

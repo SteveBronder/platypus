@@ -1,0 +1,37 @@
+<RCC>
+    <qresource>
+        <file>images/icon.png</file>
+
+        <file>images/done.png</file>
+        <file>images/done@2x.png</file>
+        <file>images/cancel.png</file>
+        <file>images/cancel@2x.png</file>
+
+        <file>images/1to1.png</file>
+        <file>images/1to1@2x.png</file>
+        <file>images/fitImage.png</file>
+        <file>images/zoomIn.png</file>
+        <file>images/zoomIn@2x.png</file>
+        <file>images/zoomOut.png</file>
+        <file>images/zoomOut@2x.png</file>
+
+        <file>images/reset.png</file>
+        <file>images/reset@2x.png</file>
+
+        <file>images/polygon.png</file>
+        <file>images/polygon@2x.png</file>
+        <file>images/mask.png</file>
+        <file>images/mask@2x.png</file>
+
+        <file>images/invert.png</file>
+        <file>images/invert@2x.png</file>
+
+        <file>images/overlay.png</file>
+        <file>images/overlay@2x.png</file>
+
+        <file>images/detectCradle.png</file>
+        <file>images/detectCradle@2x.png</file>
+        <file>images/removeCradle.png</file>
+        <file>images/removeCradle@2x.png</file>
+    </qresource>
+</RCC>

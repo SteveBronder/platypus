@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright (c) 2016, Gabor Adam Fodor <fogggab@yahoo.com>
 * All rights reserved.

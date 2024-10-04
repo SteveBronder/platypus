@@ -88,7 +88,7 @@ install(FILES
     DESTINATION lib/cmake/platypus)
 
 # Optionally, build executables if this is the main project
-option(BUILD_EXAMPLES "Build example executables" ON)
+option(BUILD_EXAMPLES "Build example executables" OFF)
 
 if(BUILD_EXAMPLES)
     add_executable(Demo ${CMAKE_CURRENT_SOURCE_DIR}/exe/mainDemo.cpp)
@@ -102,4 +102,8 @@ if(BUILD_EXAMPLES)
     add_executable(TextureRemoval ${CMAKE_CURRENT_SOURCE_DIR}/exe/mainTextureRemoval.cpp)
     target_include_directories(TextureRemoval PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
     target_link_libraries(TextureRemoval PRIVATE platypus)
+endif()
+
+if (BUILD_GUI)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/gui)
 endif()

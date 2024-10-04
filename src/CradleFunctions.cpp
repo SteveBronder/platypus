@@ -28,6 +28,7 @@
 #define RAD(A)  (M_PI*((double)(A))/180.0)
 #endif
 namespace CradleFunctions{
+	using uchar = unsigned char;
 	static const int MAXIMA = 0;
 	static const int MINIMA = 1;
 	static const Callbacks *s_callbacks;
@@ -56,8 +57,8 @@ namespace CradleFunctions{
 		cv::Mat &out,				//Cradle removed X-ray is saved out here
 		cv::Mat &cradle,			//Cradle component after separation saved out here
 		cv::Mat &mask,				//Mask containing marked vertical/horizontal cradle positions
-		std::vector<int> &vrange,	//Approximate position of vertical cradle pieces, in pairs of (X_start1, X_end1,..,X_startN, X_endN) 
-		std::vector<int> &hrange,	//Approximate position of horizontal cradle pieces, in pairs of (Y_start1, Y_end1,..,Y_startM, Y_endM) 
+		std::vector<int> &vrange,	//Approximate position of vertical cradle pieces, in pairs of (X_start1, X_end1,..,X_startN, X_endN)
+		std::vector<int> &hrange,	//Approximate position of horizontal cradle pieces, in pairs of (Y_start1, Y_end1,..,Y_startM, Y_endM)
 		MarkedSegments &ms			//MarkedSegment structure will contain processing information
 		){
 		//Initialize cradle part
@@ -177,10 +178,10 @@ namespace CradleFunctions{
 					for (int j = 0; j < img.cols; j++){
 						int py = vrange[2 * i] + j * std::cos(angle1) + k;
 						if (py >= 0 && py < mask.rows - 1){
-							if ((mask.at<char>(py, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(py, j) & (V_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(py, j)*grad.at<float>(py, j);
 							}
-							if ((mask.at<char>(py + 1, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(py + 1, j) & (V_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(py + 1, j)*grad.at<float>(py + 1, j);
 							}
 						}
@@ -221,10 +222,10 @@ namespace CradleFunctions{
 					for (int j = 0; j < img.cols; j++){
 						int py = vrange[2 * i + 1] + j * std::cos(angle2) + k;
 						if (py >= 0 && py < img.rows - 1){
-							if ((mask.at<char>(py, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(py, j) & (V_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(py, j)*grad.at<float>(py, j);
 							}
-							if ((mask.at<char>(py + 1, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(py + 1, j) & (V_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(py + 1, j)*grad.at<float>(py + 1, j);
 							}
 						}
@@ -252,7 +253,7 @@ namespace CradleFunctions{
 				}
 				//Mark segment mask
 				for (int k = midposition[i][j]; k <= py; k++){
-					mask.at<char>(k, j) |= H_MASK;
+					mask.at<uchar>(k, j) |= H_MASK;
 				}
 				midposition[i][j] += py;
 			}
@@ -345,10 +346,10 @@ namespace CradleFunctions{
 					for (int j = 0; j < img.rows; j++){
 						int py = vrange[2 * i] + j * std::sin(angle1) + k;
 						if (py >= 0 && py < mask.cols - 1){
-							if ((mask.at<char>(j, py) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, py) & (H_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(j, grad.cols - py)*grad.at<float>(j, py);
 							}
-							if ((mask.at<char>(j, py + 1) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, py + 1) & (H_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(j, py + 1)*grad.at<float>(j, py + 1);
 							}
 						}
@@ -387,10 +388,10 @@ namespace CradleFunctions{
 					for (int j = 0; j < img.rows; j++){
 						int py = vrange[2 * i + 1] + j * std::sin(angle2) + k;
 						if (py >= 0 && py < mask.cols - 1){
-							if ((mask.at<char>(j, py) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, py) & (H_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(j, grad.cols - py)*grad.at<float>(j, py);
 							}
-							if ((mask.at<char>(j, py + 1) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, py + 1) & (H_MASK | DEFECT)) == 0){
 								cost += grad.at<float>(j, py + 1)*grad.at<float>(j, py + 1);
 							}
 						}
@@ -417,7 +418,7 @@ namespace CradleFunctions{
 
 				//Mark segment mask
 				for (int k = midposition[i][j]; k <= py; k++){
-					mask.at<char>(j, k) |= V_MASK;
+					mask.at<uchar>(j, k) |= V_MASK;
 				}
 				midposition[i][j] += py;
 			}
@@ -559,7 +560,7 @@ namespace CradleFunctions{
 				int maxv = std::min(sy + widthv / 2 + sv, img.cols);
 
 				//Middle of previously identified cradle intersections is marked by (H_MASK | V_MASK)
-				if ((mask.at<char>(sx, sy) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
+				if ((mask.at<uchar>(sx, sy) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
 					int stx, enx, sty, eny, ok;
 
 					//Search upwards
@@ -569,7 +570,7 @@ namespace CradleFunctions{
 						ok = 1;
 						if (stx != -1){
 							for (int k = minv; k < maxv; k++){
-								if ((mask.at<char>(stx, k) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
+								if ((mask.at<uchar>(stx, k) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
 									ok = 0;
 									stx--;
 									break;
@@ -585,7 +586,7 @@ namespace CradleFunctions{
 						ok = 1;
 						if (enx != img.rows){
 							for (int k = minv; k < maxv; k++){
-								if ((mask.at<char>(enx, k)  & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
+								if ((mask.at<uchar>(enx, k)  & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
 									ok = 0;
 									enx++;
 									break;
@@ -601,7 +602,7 @@ namespace CradleFunctions{
 						ok = 1;
 						if (sty != -1){
 							for (int k = minh; k < maxh; k++){
-								if ((mask.at<char>(k, sty) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
+								if ((mask.at<uchar>(k, sty) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
 									ok = 0;
 									sty--;
 									break;
@@ -617,7 +618,7 @@ namespace CradleFunctions{
 						ok = 1;
 						if (eny != img.cols){
 							for (int k = minh; k < maxh; k++){
-								if ((mask.at<char>(k, eny) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
+								if ((mask.at<uchar>(k, eny) & (H_MASK | V_MASK)) == (H_MASK | V_MASK)){
 									ok = 0;
 									eny++;
 									break;
@@ -655,7 +656,7 @@ namespace CradleFunctions{
 					//Remove cradle part
 					for (int k = stx; k <= enx; k++){
 						for (int l = sty; l <= eny; l++){
-							if (cradle.at<float>(k, l) == 0 && ((mask.at<char>(k, l) & DEFECT) == 0)){
+							if (cradle.at<float>(k, l) == 0 && ((mask.at<uchar>(k, l) & DEFECT) == 0)){
 
 								float val = filtered.at<float>(k, l);
 
@@ -827,9 +828,9 @@ namespace CradleFunctions{
 				int p1, p2;
 				p1 = p2 = midpos[i][j];
 
-				while (p1 > 0 && (mask.at<char>(j, p1) & V_MASK) == V_MASK)
+				while (p1 > 0 && (mask.at<uchar>(j, p1) & V_MASK) == V_MASK)
 					p1--;
-				while (p2 < mask.cols - 1 && (mask.at<char>(j, p2) & V_MASK) == V_MASK)
+				while (p2 < mask.cols - 1 && (mask.at<uchar>(j, p2) & V_MASK) == V_MASK)
 					p2++;
 
 				int start = std::max(0, p1 - sfm);
@@ -838,7 +839,7 @@ namespace CradleFunctions{
 				//Check if contains horizontal mask
 				int maskfound = 0;
 				for (int k = start; k <= end; k++){
-					if ((mask.at<char>(j, k) & H_MASK) != 0){
+					if ((mask.at<uchar>(j, k) & H_MASK) != 0){
 						maskfound++;
 					}
 				}
@@ -846,7 +847,7 @@ namespace CradleFunctions{
 				if (maskfound > 0){
 					//Mark as vertical cradle (for cross section later on)
 					for (int k = p1; k <= p2; k++){
-						mask.at<char>(j, k) |= V_MASK;
+						mask.at<uchar>(j, k) |= V_MASK;
 					}
 
 					if (segment_seek == 0){
@@ -884,13 +885,13 @@ namespace CradleFunctions{
 						std::fill(medi.begin(), medi.end(), -1);
 						sample.ncu[j] = -1;
 						for (int z = std::max(0, p1 - 2 * sfm); z <= p1 - sfm; z++){
-							if ((mask.at<char>(j, z) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, z) & (H_MASK | DEFECT)) == 0){
 								medi[z - (p1 - 2 * sfm)] = filtered.at<float>(j, z);
 							}
 						}
 						sample.ncu[j] = getMedian(medi);
 
-						if ((mask.at<char>(j, p1 + sfm) & (H_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(j, p1 + sfm) & (H_MASK | DEFECT)) == 0){
 							sample.cu[j] = filtered.at<float>(j, p1 + sfm);
 						}
 						else{
@@ -904,13 +905,13 @@ namespace CradleFunctions{
 						std::fill(medi.begin(), medi.end(), -1);
 						sample.ncl[j] = -1;
 						for (int z = p2 + sfm; z < std::min(p2 + 2 * sfm, filtered.cols); z++){
-							if ((mask.at<char>(j, z) & (H_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(j, z) & (H_MASK | DEFECT)) == 0){
 								medi[z - p2 - sfm] = filtered.at<float>(j, z);
 							}
 						}
 						sample.ncl[j] = getMedian(medi);
 
-						if ((mask.at<char>(j, p2 - sfm) & (H_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(j, p2 - sfm) & (H_MASK | DEFECT)) == 0){
 							sample.cl[j] = filtered.at<float>(j, p2 - sfm);
 						}
 						else{
@@ -1080,9 +1081,9 @@ namespace CradleFunctions{
 					int p1, p2;
 					p1 = p2 = midpos[i][j];
 
-					while (p1 > 0 && (mask.at<char>(j, p1) & V_MASK) == V_MASK)
+					while (p1 > 0 && (mask.at<uchar>(j, p1) & V_MASK) == V_MASK)
 						p1--;
-					while (p2 < mask.cols - 1 && (mask.at<char>(j, p2) & V_MASK) == V_MASK)
+					while (p2 < mask.cols - 1 && (mask.at<uchar>(j, p2) & V_MASK) == V_MASK)
 						p2++;
 
 					p1v[j - sample.start] = p1;
@@ -1090,12 +1091,12 @@ namespace CradleFunctions{
 
 					//Mark as vertical cradle
 					for (int k = p1; k <= p2; k++){
-						mask.at<char>(j, k) |= V_MASK;
+						mask.at<uchar>(j, k) |= V_MASK;
 					}
 
 					//Remove intensity from middle of cradle based on interpolation of the two edge profiles
 					for (int k = p1 + sfm / 2; k < p2 - sfm / 2; k++){
-						if (((mask.at<char>(j, k)) & (H_MASK | DEFECT)) == 0){
+						if (((mask.at<uchar>(j, k)) & (H_MASK | DEFECT)) == 0){
 							float pv = img.at<float>(j, k);
 
 							//Get the two estimations based on the edge profiles
@@ -1126,7 +1127,7 @@ namespace CradleFunctions{
 					int lpmin = std::max(p1v[j - sample.start] - sfm, 0);
 					int lpmax = std::min(p1v[j - sample.start] + sfm, filtered.cols - 1);
 					for (int l = lpmin; l <= lpmax; l++){
-						if ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0){
 							edgemap[mid - l + sfm] += filtered.at<float>(j, l);
 							cnt[mid - l + sfm]++;
 						}
@@ -1178,7 +1179,7 @@ namespace CradleFunctions{
 							//Get means of the two edge profiles
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 									samplemean += filtered.at<float>(j, l);
 									edgemean += edgemap[pos];
 									c++;
@@ -1192,7 +1193,7 @@ namespace CradleFunctions{
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
 								if (pos >= 0 && pos < edgemap.size()){
-									if (edgemap[pos] != 0 && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+									if (edgemap[pos] != 0 && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 										float tmp = (edgemap[pos] - edgemean) - (filtered.at<float>(j, l) - samplemean);
 										cost += tmp*tmp;
 									}
@@ -1229,7 +1230,7 @@ namespace CradleFunctions{
 
 						for (int l = lpmin; l < lpmax; l++){
 							int pos = mid - l + sfm + bk;
-							if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+							if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 								cradle.at<float>(j, l) = a*edgemap[pos] + b;
 								if (pos <= separation){
 									ms.piece_mask.at<ushort>(j, l) = ms.pieces;
@@ -1249,7 +1250,7 @@ namespace CradleFunctions{
 					int lpmin = std::max(p2v[j - sample.start] - sfm, 0);
 					int lpmax = std::min(p2v[j - sample.start] + sfm, filtered.cols - 1);
 					for (int l = lpmin; l <= lpmax; l++){
-						if ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0){
 							edgemap[mid - l + sfm] += filtered.at<float>(j, l);
 							cnt[mid - l + sfm]++;
 						}
@@ -1265,7 +1266,7 @@ namespace CradleFunctions{
 				while (first < edgemap.size() && cnt[first] == 0) first++;
 				last = edgemap.size() - 1;
 				while (last >= 0 && cnt[last] == 0) last--;
-				
+
 				//Find proper edge of the cradle
 				separation = last - 1;
 				minv = edgemap[separation];
@@ -1300,7 +1301,7 @@ namespace CradleFunctions{
 							//Get means of the two edge profiles
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 									samplemean += filtered.at<float>(j, l);
 									edgemean += edgemap[pos];
 									c++;
@@ -1313,7 +1314,7 @@ namespace CradleFunctions{
 							//Check how well it fits
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 									if (edgemap[pos] != 0){
 										float tmp = (edgemap[pos] - edgemean) - (filtered.at<float>(j, l) - samplemean);
 										cost += tmp*tmp;
@@ -1351,7 +1352,7 @@ namespace CradleFunctions{
 
 						for (int l = lpmin; l < lpmax; l++){
 							int pos = mid - l + sfm + bk;
-							if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(j, l) & (H_MASK | DEFECT)) == 0)){
+							if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(j, l) & (H_MASK | DEFECT)) == 0)){
 								cradle.at<float>(j, l) = a*edgemap[pos] + b;
 								if (pos >= separation){
 									ms.piece_mask.at<ushort>(j, l) = ms.pieces;
@@ -1363,7 +1364,7 @@ namespace CradleFunctions{
 			}
 		}
 	}
-	
+
 	//Remove horizontal cradle pieces and save out correction model used for later usage
 	void removeHorizontal(
 		const cv::Mat &img,									//Input grayscale float X-ray image
@@ -1434,9 +1435,9 @@ namespace CradleFunctions{
 				int p1, p2;
 				p1 = p2 = midpos[i][j];
 
-				while (p1 > 0 && (mask.at<char>(p1, j) & H_MASK) == H_MASK)
+				while (p1 > 0 && (mask.at<uchar>(p1, j) & H_MASK) == H_MASK)
 					p1--;
-				while (p2 < mask.rows - 1 && (mask.at<char>(p2, j) & H_MASK) == H_MASK)
+				while (p2 < mask.rows - 1 && (mask.at<uchar>(p2, j) & H_MASK) == H_MASK)
 					p2++;
 
 				int start = std::max(0, p1 - sfm);
@@ -1445,7 +1446,7 @@ namespace CradleFunctions{
 				//Check if contains vertical mask
 				int maskfound = 0;
 				for (int k = start; k <= end; k++){
-					if ((mask.at<char>(k, j) & V_MASK) != 0){
+					if ((mask.at<uchar>(k, j) & V_MASK) != 0){
 						maskfound++;
 					}
 				}
@@ -1486,13 +1487,13 @@ namespace CradleFunctions{
 						std::fill(medi.begin(), medi.end(), -1);
 						sample.ncu[j] = -1;
 						for (int z = std::max(0, p1 - 2 * sfm); z <= p1 - sfm; z++){
-							if ((mask.at<char>(z, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(z, j) & (V_MASK | DEFECT)) == 0){
 								medi[z - (p1 - 2 * sfm)] = filtered.at<float>(z, j);
 							}
 						}
 						sample.ncu[j] = getMedian(medi);
 
-						if ((mask.at<char>(p1 + sfm, j) & (V_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(p1 + sfm, j) & (V_MASK | DEFECT)) == 0){
 							sample.cu[j] = filtered.at<float>(p1 + sfm, j);
 						}
 						else{
@@ -1506,13 +1507,13 @@ namespace CradleFunctions{
 						std::fill(medi.begin(), medi.end(), -1);
 						sample.ncl[j] = -1;
 						for (int z = p2 + sfm; z < std::min(p2 + 2 * sfm, filtered.rows); z++){
-							if ((mask.at<char>(z, j) & (V_MASK | DEFECT)) == 0){
+							if ((mask.at<uchar>(z, j) & (V_MASK | DEFECT)) == 0){
 								medi[z - p2 - sfm] = filtered.at<float>(z, j);
 							}
 						}
 						sample.ncl[j] = getMedian(medi);
 
-						if ((mask.at<char>(p2 - sfm, j) & (V_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(p2 - sfm, j) & (V_MASK | DEFECT)) == 0){
 							sample.cl[j] = filtered.at<float>(p2 - sfm, j);
 						}
 						else{
@@ -1671,9 +1672,9 @@ namespace CradleFunctions{
 					int p1, p2;
 					p1 = p2 = midpos[i][j];
 
-					while (p1 > 0 && (mask.at<char>(p1, j) & H_MASK) == H_MASK)
+					while (p1 > 0 && (mask.at<uchar>(p1, j) & H_MASK) == H_MASK)
 						p1--;
-					while (p2 < mask.rows - 1 && (mask.at<char>(p2, j) & H_MASK) == H_MASK)
+					while (p2 < mask.rows - 1 && (mask.at<uchar>(p2, j) & H_MASK) == H_MASK)
 						p2++;
 
 					p1v[j - sample.start] = p1;
@@ -1684,7 +1685,7 @@ namespace CradleFunctions{
 
 					//Remove intensity from middle of cradle based on interpolation of the two edge profiles
 					for (int k = p1 + sfm / 2; k < p2 - sfm / 2; k++){
-						if (((mask.at<char>(k, j)) & (V_MASK | DEFECT)) == 0){
+						if (((mask.at<uchar>(k, j)) & (V_MASK | DEFECT)) == 0){
 							float pv = img.at<float>(k, j);
 
 							//Get the two estimations based on the edge profiles
@@ -1696,7 +1697,7 @@ namespace CradleFunctions{
 
 							ms.piece_mask.at<ushort>(k, j) = ms.pieces;
 							cradle.at<float>(k, j) = pv - iv;
-							mask.at<char>(k, j) |= H_MASK;
+							mask.at<uchar>(k, j) |= H_MASK;
 						}
 					}
 				}
@@ -1723,7 +1724,7 @@ namespace CradleFunctions{
 					int lpmin = std::max(p1v[j - sample.start] - sfm, 0);
 					int lpmax = std::min(p1v[j - sample.start] + sfm, filtered.rows - 1);
 					for (int l = lpmin; l <= lpmax; l++){
-						if ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0){
 							edgesample[mid - l + sfm][j - sample.start] = filtered.at<float>(l, j);
 							cnt[mid - l + sfm]++;
 						}
@@ -1752,7 +1753,7 @@ namespace CradleFunctions{
 				while (edgemap[separation] >(minv + maxv) / 2){
 					separation++;
 				}
-				
+
 				if (first < last){
 
 					//Remove edge
@@ -1777,7 +1778,7 @@ namespace CradleFunctions{
 							//Get means of the two edge profiles
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 									samplemean += filtered.at<float>(l, j);
 									edgemean += edgemap[pos];
 									c++;
@@ -1790,7 +1791,7 @@ namespace CradleFunctions{
 							//Check how well it fits
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 									if (cnt[pos] != 0){
 										float tmp = (edgemap[pos] - edgemean) - (filtered.at<float>(l, j) - samplemean);
 										cost += tmp*tmp;
@@ -1828,7 +1829,7 @@ namespace CradleFunctions{
 
 						for (int l = lpmin; l < lpmax; l++){
 							int pos = mid - l + sfm + bk;
-							if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+							if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 								cradle.at<float>(l, j) = a*edgemap[pos] + b;
 								if (pos <= separation){
 									ms.piece_mask.at<ushort>(l, j) = ms.pieces;
@@ -1848,7 +1849,7 @@ namespace CradleFunctions{
 					int lpmin = std::max(p2v[j - sample.start] - sfm, 0);
 					int lpmax = std::min(p2v[j - sample.start] + sfm, filtered.rows - 1);
 					for (int l = lpmin; l <= lpmax; l++){
-						if ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0){
+						if ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0){
 							edgemap[mid - l + sfm] += filtered.at<float>(l, j);
 							cnt[mid - l + sfm]++;
 						}
@@ -1864,7 +1865,7 @@ namespace CradleFunctions{
 				while (first < edgemap.size() && cnt[first] == 0) first++;
 				last = edgemap.size() - 1;
 				while (last >= 0 && cnt[last] == 0) last--;
-				
+
 				//Find proper edge of the cradle
 				separation = last - 1;
 				minv = edgemap[separation];
@@ -1899,7 +1900,7 @@ namespace CradleFunctions{
 							//Get means of the two edge profiles
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 									samplemean += filtered.at<float>(l, j);
 									edgemean += edgemap[pos];
 									c++;
@@ -1912,7 +1913,7 @@ namespace CradleFunctions{
 							//Check how well it fits
 							for (int l = lpmin; l < lpmax; l++){
 								int pos = mid - l + sfm + k;
-								if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+								if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 									if (edgemap[pos] != 0){
 										float tmp = (edgemap[pos] - edgemean) - (filtered.at<float>(l, j) - samplemean);
 										cost += tmp*tmp;
@@ -1950,7 +1951,7 @@ namespace CradleFunctions{
 
 						for (int l = lpmin; l < lpmax; l++){
 							int pos = mid - l + sfm + bk;
-							if (pos >= 0 && pos < edgemap.size() && ((mask.at<char>(l, j) & (V_MASK | DEFECT)) == 0)){
+							if (pos >= 0 && pos < edgemap.size() && ((mask.at<uchar>(l, j) & (V_MASK | DEFECT)) == 0)){
 								cradle.at<float>(l, j) = a*edgemap[pos] + b;
 								if (pos >= separation){
 									ms.piece_mask.at<ushort>(l, j) = ms.pieces;
@@ -2025,7 +2026,7 @@ namespace CradleFunctions{
 	}
 
 	//Function responsable for detecting and correcting, when possible, for overcorrections in border areas
-	//of cross-sections. The detection is based on trying to identify strong, black lines in these areas 
+	//of cross-sections. The detection is based on trying to identify strong, black lines in these areas
 	//and if they are present, findin the right smoothing parameter that removes these artifacts.
 	void removeEdgeArtifact(const cv::Mat &img, cv::Mat &cradle, int dir, int stx, int enx, int sty, int eny){
 		cv::Mat select, dct, rec, lowp, input, lowpassori, orig;
@@ -2124,7 +2125,7 @@ namespace CradleFunctions{
 		//Reconstruction difference map
 		rec = select - rec;
 		dest = dest - mean(dest);
-		
+
 		//Apply strong smooth filter on rec
 		cv::blur(rec, rec, cv::Size(wb, wb));
 
@@ -2237,7 +2238,7 @@ namespace CradleFunctions{
 		//Calculate Radon transform
 		for (int y = sx; y < sx + H; y++){
 			for (int x = sy; x < sy + W; x++){
-				if (y >= 0 && y < mask.rows && x >= 0 && x < mask.cols && ((mask.at<char>(y, x) & noflag) == 0)){
+				if (y >= 0 && y < mask.rows && x >= 0 && x < mask.cols && ((mask.at<uchar>(y, x) & noflag) == 0)){
 					for (int i = 0; i < thetav.size(); i++){
 						double theta = thetav[i];
 						if (theta < 0)
@@ -2285,7 +2286,7 @@ namespace CradleFunctions{
 		for (int i = 0; i < vrange.size() / 2; i++){
 			for (int j = 0; j < (mask).rows; j++){
 				for (int k = std::max(0, vrange[i * 2] - s); k < std::min(mask.cols - 1, vrange[i * 2 + 1] + s); k++){
-					mask.at<char>(j, k) |= V_MASK;
+					mask.at<uchar>(j, k) |= V_MASK;
 				}
 			}
 		}
@@ -2296,7 +2297,7 @@ namespace CradleFunctions{
 		for (int i = 0; i < vrange.size() / 2; i++){
 			for (int j = 0; j < (mask).rows; j++){
 				for (int k = std::max(0, vrange[i * 2] - s); k < std::min(mask.cols - 1, vrange[i * 2 + 1] + s); k++){
-					mask.at<char>(j, k) ^= V_MASK;
+					mask.at<uchar>(j, k) ^= V_MASK;
 				}
 			}
 		}
@@ -2324,12 +2325,12 @@ namespace CradleFunctions{
 		std::vector<int> solv;
 		std::vector<int> solh;
 		cv::Mat dest;
-		
+
 		//Sum up vertical elements
 		cv::Mat vsum(1, ghimg.cols, CV_32F, cv::Scalar(0));
 		for (int j = 0; j < ghimg.cols; j++){
 			for (int i = 0; i < ghimg.rows; i++){
-				if ((mask.at<char>(i, j) & DEFECT) != DEFECT){
+				if ((mask.at<uchar>(i, j) & DEFECT) != DEFECT){
 					vsum.at<float>(0, j) = vsum.at<float>(0, j) + ghimg.at<float>(i, j);
 				}
 			}
@@ -2454,7 +2455,7 @@ namespace CradleFunctions{
 		cv::Mat hsum(1, (gvimg).rows, CV_32F, cv::Scalar(0));
 		for (int j = 0; j < (gvimg).cols; j++){
 			for (int i = 0; i < (gvimg).rows; i++){
-				if ((mask.at<char>(i, j) & DEFECT) != DEFECT){
+				if ((mask.at<uchar>(i, j) & DEFECT) != DEFECT){
 					hsum.at<float>(0, i) = hsum.at<float>(0, i) + (gvimg).at<float>(i, j);
 				}
 			}
@@ -2462,7 +2463,7 @@ namespace CradleFunctions{
 
 		//Smooth filtering
 		cv::filter2D(hsum, dest, CV_32F, smooth, cv::Point(-1, -1), 0, cv::BORDER_DEFAULT);
-		
+
 		//Normalize - extract mean of the signal
 		mean = 0;
 		for (int i = 0; i < (gvimg).rows; i++){
@@ -2577,7 +2578,7 @@ namespace CradleFunctions{
 	}
 
 	//Cradle detection method, returning approximate horizontal/vertical cradle positions in 'vrange' and 'hrange'
-	//with number of vertical and horizontal pieces to be detected specified by 'vn' and 'hn' 
+	//with number of vertical and horizontal pieces to be detected specified by 'vn' and 'hn'
 	void cradledetect(const cv::Mat &in, const cv::Mat &mask, int vn, int hn, std::vector<int> &vrange, std::vector<int> &hrange){
 
 		//Filter gradients for horizontal/vertical
@@ -2604,7 +2605,7 @@ namespace CradleFunctions{
 		cv::Mat vsum(1, ghimg.cols, CV_32F, cv::Scalar(0));
 		for (int j = 0; j < ghimg.cols; j++){
 			for (int i = 0; i < ghimg.rows; i++){
-				if ((mask.at<char>(i, j) & DEFECT) != DEFECT){
+				if ((mask.at<uchar>(i, j) & DEFECT) != DEFECT){
 					vsum.at<float>(0, j) = vsum.at<float>(0, j) + ghimg.at<float>(i, j);
 				}
 			}
@@ -2775,7 +2776,7 @@ namespace CradleFunctions{
 		cv::Mat hsum(1, (gvimg).rows, CV_32F, cv::Scalar(0));
 		for (int j = 0; j < (gvimg).cols; j++){
 			for (int i = 0; i < (gvimg).rows; i++){
-				if ((mask.at<char>(i, j) & DEFECT) != DEFECT){
+				if ((mask.at<uchar>(i, j) & DEFECT) != DEFECT){
 					hsum.at<float>(0, i) = hsum.at<float>(0, i) + (gvimg).at<float>(i, j);
 				}
 			}
@@ -3099,8 +3100,8 @@ namespace CradleFunctions{
 				int r = v[1];
 				double delta = (m).at<float>(j, 0) / (r - l) / 2;
 				for (int k = l; k <= r; k++){
-					mask.at<char>(shift + up.at<int>(k - l, 0) - s0 / 2, k) |= flag;
-					mask.at<char>(shift + down.at<int>(k - l, 0) - s0 / 2, k) |= flag;
+					mask.at<uchar>(shift + up.at<int>(k - l, 0) - s0 / 2, k) |= flag;
+					mask.at<uchar>(shift + down.at<int>(k - l, 0) - s0 / 2, k) |= flag;
 					(cradle).at<float>(shift + up.at<int>(k - l, 0) - s0 / 2, k) += delta;
 					(cradle).at<float>(shift + down.at<int>(k - l, 0) - s0 / 2, k) += delta;
 				}
@@ -3124,8 +3125,8 @@ namespace CradleFunctions{
 				int l = v[0];
 				int r = v[1];
 				for (int k = l; k <= r; k++){
-					mask.at<char>(shift + up.at<int>(k - l, 0) - s0 / 2, k) |= flag;
-					mask.at<char>(shift + down.at<int>(k - l, 0) - s0 / 2, k) |= flag;
+					mask.at<uchar>(shift + up.at<int>(k - l, 0) - s0 / 2, k) |= flag;
+					mask.at<uchar>(shift + down.at<int>(k - l, 0) - s0 / 2, k) |= flag;
 				}
 			}
 			j++;
@@ -3241,7 +3242,7 @@ namespace CradleFunctions{
 		//Calculate Radon transform for single angle
 		for (int y = sx; y < sx + H; y++){
 			for (int x = sy; x < sy + W; x++){
-				if ((mask.at<char>(y, x) & noflag) == 0){
+				if ((mask.at<uchar>(y, x) & noflag) == 0){
 					int r = (x - center_x) *1.0 * cos(RAD(theta)) - (y - center_y) *1.0 * sin(RAD(theta));
 					acc.at<float>((r + maxv), 0) = acc.at<float>((r + maxv), 0) + (d).at<float>(y, x);
 				}
@@ -3422,7 +3423,7 @@ namespace CradleFunctions{
 		}
 		return sum / v.rows / v.cols;
 	}
-	
+
 	//Get the median of the vector
 	float getVariance(std::vector<float> &v){
 		int s = v.size();
@@ -3461,9 +3462,9 @@ namespace CradleFunctions{
 	void writeMarkedSegmentsFile(std::string name, MarkedSegments ms){
 		std::ofstream output(name.c_str());
 		output << ms.pieces << std::endl;	//Nr pieces
-		
+
 		//pieceIDh
-		output << ms.pieceIDh.size() << std::endl;	
+		output << ms.pieceIDh.size() << std::endl;
 		for (int i = 0; i < ms.pieceIDh.size(); i++){
 			output << ms.pieceIDh[i].size() << std::endl;
 			for (int j = 0; j < ms.pieceIDh[i].size(); j++)

@@ -35,7 +35,7 @@ namespace TextureRemoval{
 	const int SM = 4;				//Sub-sampling factor for columns
 	const int PSN = 9;				//Sub-sampling factor for rows for clustering
 	const int PSM = 9;				//Sub-sampling factor for columns for clustering
-	const int NR_NEIGHBOURS = 5;	//Nr neighbors for Nearest-neighbour (NN) search	
+	const int NR_NEIGHBOURS = 5;	//Nr neighbors for Nearest-neighbour (NN) search
 	const int max_samples = 10000;	//Maximum number of samples to be processed for the post-inference algo
 
 	//Shearlet decomposition horizontal/vertical angle parameters
@@ -87,7 +87,7 @@ namespace TextureRemoval{
 		//Store integer coordinates of blocks
 		std::vector<std::vector<int>> coords;
 		sx = sy = 0;
-		
+
 		//Generate coordinates of blocks
 		while (sx < N){
 			ex = sx + block_size;
@@ -115,7 +115,7 @@ namespace TextureRemoval{
 				sy = sy + block_size - overlap;
 			}
 		}
-
+    puts("TextureRemoval.cpp");
 		//MCA decomposition
 		#pragma omp parallel for
 		for (int l = 0; l < coords.size(); l++){
@@ -126,7 +126,7 @@ namespace TextureRemoval{
 			{
 				#pragma omp atomic
 				processed = (int)(l * 10/ coords.size());
-			
+
 				// progress/abort
 				#pragma omp critical
 				if (!CradleFunctions::progress(processed, tot_progress))
@@ -165,7 +165,7 @@ namespace TextureRemoval{
 				}
 			}
 		}
-		
+
 		if (canceled)
 			return;
 
@@ -183,7 +183,7 @@ namespace TextureRemoval{
 
 		//Type of sampled piece (horizontal/vertical/cross section)
 		std::vector<int> sample_type(ms.pieceIDh.size() + ms.pieceIDv.size() + 2);
-		
+
 		//Mark cradle directions
 		for (int i = 0; i < ms.pieceIDh.size(); i++){
 			sample_type[i + 2] = CradleFunctions::HORIZONTAL_DIR;
@@ -335,14 +335,19 @@ namespace TextureRemoval{
 
 		std::vector<int> sample_pos(sample_type.size());
 		std::vector<std::vector<std::vector<float>>> sample_select(sample_type.size());
+    std::cout << "sample_select.size(): " << sample_select.size() << std::endl;
+		std::cout << "sample_type.size(): " << sample_type.size() << std::endl;
 
 		//Randomly select samples to reduce computation time
 		for (int i = 0; i < sample_select.size(); i++){
+			std::cout << "Sample iter: " << i << std::endl;
 			int local_pos = 0;
 			std::vector<std::vector<float>> local(full_samples.size());
 			//Find all samples with corresponding number
 			for (int j = 0; j < full_samples.size(); j++){
+				std::cout << "Sample index: " << sample_index[j] << ", " << i << " " << std::endl;
 				if (sample_index[j] == i){
+					std::cout << "sample chosen" << std::endl;
 					//Copy sample to local selection
 					local[local_pos] = std::vector<float>(full_samples[j].size());
 					for (int k = 0; k < full_samples[j].size(); k++){
@@ -351,10 +356,14 @@ namespace TextureRemoval{
 					local_pos++;
 				}
 			}
-
+			std::cout << "local size: " << local.size() << std::endl;
+      std::cout << "local_pos: " << local_pos << std::endl;
 			//Resize
 			local.resize(local_pos);
-
+      if (local.size() == 0) {
+				std::cout << "local size is 0" << std::endl;
+				continue;
+			}
 			//Sample randomly
 			sampleDataset(local, sample_select[i], max_samples);
 		}
@@ -394,7 +403,7 @@ namespace TextureRemoval{
 
 				//Train the model
 				model = gibbsSampling(sample_select[mod_sel], ncdata);
-				
+
 				cv::Mat new_texture;
 				texture.copyTo(new_texture);
 
@@ -436,7 +445,7 @@ namespace TextureRemoval{
 
 						//Save decomposition results to structure
 						coeffs = FFST::shearletTransformSpect(selection);
-						
+
 						//Use this to store samples
 						std::vector<std::vector<float>> clusters(block_size * block_size / PSN / PSM * 2);
 						int sample_pos = 0;
@@ -527,7 +536,7 @@ namespace TextureRemoval{
 						//Post inference for subsampled coefficients
 						std::vector<std::vector<float>> clusters_diffs;
 						post_inference(model, clusters, ncdata, clusters_diffs);
-						
+
 						//Look up all coefficients
 						sample_pos = 0;
 						std::vector<std::vector<float>> samples(block_size * block_size);
@@ -678,14 +687,14 @@ namespace TextureRemoval{
 
 						//Reset index of sample_pos
 						sample_pos = 0;
-						
+
 						//Apply separation to the decomposition coefficients
 						for (int i = 0; i < ex - sx; i++){
 							for (int j = 0; j < ey - sy; j++) if ((mask.at<char>(i + sx, j + sy) & CradleFunctions::DEFECT) != CradleFunctions::DEFECT) {
 
 								int pi = piecemark.at<ushort>(i + sx, j + sy) + 1;	//Index of the piece
 								int coeff_size = target_dim;
-								
+
 								if (pi > 1){
 									int ci;
 									bool partOfCradle = false;
@@ -1025,8 +1034,8 @@ namespace TextureRemoval{
 			for (int j = 0; j < k1; j++){
 				psijh1.at<float>(i, j) = gamma_distr(generator);
 			}
-		}// psijh1 = gamrnd(df/2,2/df,[p,k1]); 
-		
+		}// psijh1 = gamrnd(df/2,2/df,[p,k1]);
+
 		std::vector<float> delta1(k1);
 		gamma_distr = std::gamma_distribution<float>(ad1, bd1);
 		delta1[0] = gamma_distr(generator);
@@ -1034,7 +1043,7 @@ namespace TextureRemoval{
 		for (int i = 1; i < k1; i++){
 			delta1[i] = gamma_distr(generator);
 		}// delta1 = [gamrnd(ad1, bd1); gamrnd(ad2, bd2, [k1 - 1, 1])];
-		
+
 		std::vector<float> tauh1(k1);
 		tauh1[0] = delta1[0];
 		for (int i = 1; i < k1; i++){
@@ -1059,7 +1068,7 @@ namespace TextureRemoval{
 				psijh2.at<float>(i, j) = gamma_distr(generator);
 			}
 		}// psijh2 = gamrnd(df/2,2/df,[p,k2]);
-		
+
 		std::vector<float> delta2(k2);
 		gamma_distr = std::gamma_distribution<float>(ad1, bd1);
 		delta2[0] = gamma_distr(generator);
@@ -1067,7 +1076,7 @@ namespace TextureRemoval{
 		for (int i = 1; i < k2; i++){
 			delta2[i] = gamma_distr(generator);
 		}// delta2 = [gamrnd(Ad1, bd1); gamrnd(Ad2, bd2, [k2 - 1, 1])];
-		
+
 		std::vector<float> tauh2(k2);
 		tauh2[0] = delta2[0];
 		for (int i = 1; i < k2; i++){
@@ -1086,16 +1095,16 @@ namespace TextureRemoval{
 		for (int i = 0; i < k2; i++){
 			kappa.at<float>(0, i) = normal_distr(generator);
 		}// kappa = normrnd(0,1,[1,k2]);
-		
+
 		cv::Mat xi(Ncradle, k2, CV_32F);
 		for (int i = 0; i < Ncradle; i++){
 			for (int j = 0; j < k2; j++){
 				xi.at<float>(i, j) = normal_distr(generator) + kappa.at<float>(0, j);
 			}
 		}// xi = bsxfun(@plus, normrnd(0,1,[Ncradle,k2]),kappa);
-		
+
 		/* End of variable definition/initialization */
-		
+
 		//Variables used in the loop
 		cv::Mat Lmsg, Lmsgt, Veta, Veta1;
 		cv::Mat Meta;
@@ -1153,10 +1162,10 @@ namespace TextureRemoval{
 					eta_nctmp.at<float>(i, j) = normal_distr(generator);
 				}
 			}
-			
+
 			//Get multivariate normal distribution
 			eta_nc = Meta + eta_nctmp * Strans;
-			
+
 			// **** Update eta, cradle part  ****
 			Veta1 = rho * rho * Lmsgt * lambda;
 			for (int i = 0; i < Veta1.rows; i++){
@@ -1167,7 +1176,7 @@ namespace TextureRemoval{
 			U = Cholesky(Veta1);
 			cv::invert(U, S);
 			cv::transpose(S, Strans);
-			
+
 			//Eta mean
 			cv::transpose(Gamma, gammatrans);
 			Meta = (cradleMat - xi * gammatrans) * rho * Lmsg * Veta;
@@ -1185,7 +1194,7 @@ namespace TextureRemoval{
 
 			//Get multivariate normal distribution
 			eta_c = Meta + eta_nctmp * Strans;
-			
+
 			/*** Update beta's --> Do nothing under supervised model ***/
 
 			/*** Update Lambda ***/
@@ -1216,7 +1225,7 @@ namespace TextureRemoval{
 				for (int j = 0; j < samples.rows; j++){
 					samples.at<float>(j, 0) = normal_distr(generator);
 				}
-				
+
 				cv::Mat mvndmat = Ltransinv * Linv * blam + Ltransinv * samples;
 
 				for (int j = 0; j < mvndmat.rows; j++){
@@ -1236,7 +1245,7 @@ namespace TextureRemoval{
 					psijh1.at<float>(i, j) = gamma_distr(generator);	//gamrnd(df/2 + 0.5,1./(df/2 + bsxfun(@times,Lambda.^2,tauh1')));
 				}
 			}//  psijh1 = gamrnd(df/2 + 0.5,1./(df/2 + bsxfun(@times,Lambda.^2,tauh1')));
-			
+
 			/*** Update delta & tauh ***/
 			cv::Mat matlocal(lambda.rows, lambda.cols, CV_32F);
 			for (int i = 0; i < lambda.rows; i++){
@@ -1265,7 +1274,7 @@ namespace TextureRemoval{
 			//Resample
 			gamma_distr = std::gamma_distribution<float>(ad, 1.0 / bd);
 			delta1[0] = gamma_distr(generator);	//delta1(1) = gamrnd(ad,1/bd);
-			
+
 			//Update tauh1
 			tauh1[0] = delta1[0];
 			for (int i = 1; i < delta1.size(); i++){
@@ -1285,7 +1294,7 @@ namespace TextureRemoval{
 				//Resample
 				gamma_distr = std::gamma_distribution<float>(ad, 1.0 / bd);
 				delta1[h - 1] = gamma_distr(generator);	//delta1(h) = gamrnd(ad,1/bd);
-				
+
 				//Update tauh1
 				tauh1[0] = delta1[0];
 				for (int i = 1; i < delta1.size(); i++){
@@ -1336,7 +1345,7 @@ namespace TextureRemoval{
 
 			//Get multivariate normal distribution
 			xi = Mxi + samples * Strans;
-			
+
 			/*** Update kappa ***/
 			std::vector<float> xisum(xi.cols);
 			for (int j = 0; j < xi.cols; j++){
@@ -1350,7 +1359,7 @@ namespace TextureRemoval{
 				normal_distr = std::normal_distribution<float>(xisum[i], 1.0 / Ncradle);
 				kappa.at<float>(0, i) = normal_distr(generator);
 			}//kappa = arrayfun(@(x)normrnd(x,1/Ncradle,[1,1]),sum(xi,1)/Ncradle);
-			
+
 			/*** Update gamma ***/
 			cv::transpose(xi, xit);
 			xi2 = xit * xi;
@@ -1432,7 +1441,7 @@ namespace TextureRemoval{
 			//Resample
 			gamma_distr = std::gamma_distribution<float>(ad, 1.0 / bd);
 			delta2[0] = gamma_distr(generator);	//delta2(1) = gamrnd(ad,1/bd);
-			
+
 			//Update tauh2
 			tauh2[0] = delta2[0];
 			for (int i = 1; i < delta2.size(); i++){
@@ -1452,7 +1461,7 @@ namespace TextureRemoval{
 				//Resample
 				gamma_distr = std::gamma_distribution<float>(ad, 1.0 / bd);
 				delta2[h - 1] = gamma_distr(generator);	//delta2(h) = gamrnd(ad,1/bd);
-				
+
 				//Update tauh2
 				tauh2[0] = delta2[0];
 				for (int i = 1; i < delta2.size(); i++){
@@ -1471,7 +1480,7 @@ namespace TextureRemoval{
 					Pgam.at<float>(i, j) = psijh2.at<float>(i, j) * tauh2[j];
 				}
 			}// Pgam = bsxfun(@times,psijh2,tauh2');
-			
+
 			/*** Update precision parameters ***/
 			Plam = cv::Mat(p, k1, CV_32F);
 			for (int i = 0; i < p; i++){
@@ -1479,10 +1488,10 @@ namespace TextureRemoval{
 					Plam.at<float>(i, j) = psijh1.at<float>(i, j) * tauh1[j];
 				}
 			}// Plam = bsxfun(@times, psijh1, tauh1');
-			
+
 			//Split, in function of burn reached/not reached
 			if (iter < burn){
-				
+
 				// make adaptations for non - cradle parameters
 				float prob = 1.0 / std::exp(b0 + b1*iter);
 				float uu = unif_distr(generator);
@@ -1954,7 +1963,7 @@ namespace TextureRemoval{
 
 		//Reconstruct coefficients
 		img = FFST::inverseShearletTransformSpect(coeffs);
-		
+
 		//Copy pixels to right location
 		for (int j = csx - sx; j < cex - sx; j++){
 			for (int k = csy - sy; k < cey - sy; k++){

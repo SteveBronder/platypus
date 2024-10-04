@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright (c) 2016, Gabor Adam Fodor <fogggab@yahoo.com>
 * All rights reserved.
@@ -39,7 +40,7 @@ namespace Shearlet{
 
 	//Stores precomputed filters
 	extern std::vector<std::vector<cv::Mat>> shear_filter;
-	
+
 	//Forward transform
 	void nsst_dec2(
 		cv::Mat &in,								//Input image
@@ -57,7 +58,7 @@ namespace Shearlet{
 	);
 
 	void getFilterBank(int L, std::vector<int> &decomp, std::vector<int> &dsize);
-	
+
 	//Auxiliary functions used internally
 	std::vector<cv::Mat> atrousdec(cv::Mat &in, int level);
 	cv::Mat atrousrec(std::vector<cv::Mat> &y);

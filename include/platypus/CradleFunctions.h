@@ -1,3 +1,4 @@
+#pragma once
 /*
 * Copyright (c) 2016, Gabor Adam Fodor <fogggab@yahoo.com>
 * All rights reserved.
@@ -28,11 +29,11 @@
 namespace CradleFunctions{
 
 	//Masking parameters used during cradle/texture removal
-	const int V_MASK = 1;		//Marks that pixel is part of a vertical cradle piece
-	const int H_MASK = 2;		//Marks that pixel is part of a horizontal cradle piece
-	const int DEFECT = 4;		//Marks that pixel should be ignored during processing due to material defect
+	constexpr unsigned char V_MASK = 1;		//Marks that pixel is part of a vertical cradle piece
+	constexpr unsigned char H_MASK = 2;		//Marks that pixel is part of a horizontal cradle piece
+	constexpr unsigned char DEFECT = 4;		//Marks that pixel should be ignored during processing due to material defect
 
-	//Four possible categorizations of a pixel (part of horizontal or vertical cradle, both, or none) 
+	//Four possible categorizations of a pixel (part of horizontal or vertical cradle, both, or none)
 	const int NONCRADLE = 0;
 	const int HORIZONTAL_DIR = 1;
 	const int VERTICAL_DIR = 2;
@@ -72,14 +73,14 @@ namespace CradleFunctions{
 		cv::Mat &mask,				//Mask containing marked vertical/horizontal cradle positions
 		MarkedSegments &ms			//MarkedSegment structure will contain processing information
 	);
-	
+
 	void removeCradle(
 		const cv::Mat &in,			//Input grayscale float X-ray image
 		cv::Mat &out,				//Cradle removed X-ray is saved out here
 		cv::Mat &cradle,			//Cradle component after separation saved out here
 		cv::Mat &mask,				//Mask containing marked vertical/horizontal cradle positions
-		std::vector<int> &vrange,	//Approximate position of vertical cradle pieces, in pairs of (X_start1, X_end1,..,X_startN, X_endN) 
-		std::vector<int> &hrange,	//Approximate position of horizontal cradle pieces, in pairs of (Y_start1, Y_end1,..,Y_startM, Y_endM) 
+		std::vector<int> &vrange,	//Approximate position of vertical cradle pieces, in pairs of (X_start1, X_end1,..,X_startN, X_endN)
+		std::vector<int> &hrange,	//Approximate position of horizontal cradle pieces, in pairs of (Y_start1, Y_end1,..,Y_startM, Y_endM)
 		MarkedSegments &ms			//MarkedSegment structure will contain processing information
 	);
 

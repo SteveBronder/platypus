@@ -1,3 +1,5 @@
+
+#pragma once
 /*
 * Copyright (c) 2016, Gabor Adam Fodor <fogggab@yahoo.com>
 * All rights reserved.
@@ -23,7 +25,7 @@
 namespace DWT{
 	extern cv::Mat h0o, h0a, h0b, h1o, h1a, h1b;	//Decomposition filters
 	extern cv::Mat g0o, g0a, g0b, g1o, g1a, g1b;	//Reconstruction filters
-	
+
 	//Forward transform of 'img' into L levels, results returned in 'w1' and 'w2' in matrix form
 	void cdwt2(cv::Mat &img, int L, cv::Mat &w1, cv::Mat &w2);
 
@@ -36,7 +38,7 @@ namespace DWT{
 
 	//Inverse transform of vector form 'C' and reconstruction information in 'S1' and 'S2' of 'L' levels back to image 'img'
 	void dtwaverec2(cv::Mat &img, int L, std::vector<int> &S1, std::vector<int> &S2, std::vector<float> &C);
-	
+
 	/**
 	* Internal functions used during decomposition/reconstrution
 	**/
@@ -47,7 +49,7 @@ namespace DWT{
 
 	void colfilter(cv::Mat &in, cv::Mat &filter, cv::Mat &out);
 	void coldfilt(cv::Mat &in, cv::Mat &ha, cv::Mat &hb, cv::Mat &out);
-	
+
 	int icwtband2(cv::Mat &w1, cv::Mat &w2, std::vector<int> &S1, std::vector<int> &S2, int l, int o, std::vector<float> &c);
 	void cwtband2(std::vector<float> &C, std::vector<int> &S1, std::vector<int> &S2, int l, int o, cv::Mat &Z);
 	void cwtband2(std::vector<float> &C, std::vector<int> &S1, std::vector<int> &S2, int l, int o, cv::Mat &w1, cv::Mat &w2);
